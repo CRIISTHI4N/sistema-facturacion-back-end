@@ -8,7 +8,7 @@ export const coneccionDB = async () => {
         })
 
         const url = `${connection.connection.host}: ${connection.connection.port}`
-        console.log(`Conexión establecida: ${url}`);
+        console.log(`Conexión establecida`);
     } catch (error) {
         console.log(error.message);
         process.exit(1)

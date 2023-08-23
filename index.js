@@ -36,7 +36,7 @@ const corsOptions = {
         }
     }
 }
-app.use(cors(corsOptions))
+// app.use(cors(corsOptions))
 // =================================================
 
 // Rutas
@@ -47,7 +47,8 @@ app.use('/api/proveedor', proveedorRoute)
 app.use('/api/cliente', clienteRoute)
 app.use('/api/factura', facturaRoute)
 
+const PORT = process.env.PORT || 4000
 // Lanzamiento del servidor
-app.listen(process.env.PORT, () => {
+app.listen(PORT, () => {
     console.log('CONECTANDO...');
 })
