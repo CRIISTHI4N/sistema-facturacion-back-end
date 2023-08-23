@@ -1,0 +1,24 @@
+{
+  "name": "sistema-facturacion-back-end",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "author": "Cristhian Velez",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "5.1.1",
+    "cors": "2.8.5",
+    "decimal.js": "10.4.3",
+    "dotenv": "16.3.1",
+    "express": "4.18.2",
+    "mongoose": "7.3.4",
+    "uuid": "9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "3.0.1"
+  }
+}
