@@ -40,6 +40,14 @@ app.use(cors(corsOptions))
 // =================================================
 
 // Rutas
+
+app.get('/', (req, res) => {
+    console.log('HOLA');
+    res.send('asf')
+})
+
+
+
 app.use('/api/usuario', usuarioRoute)
 app.use('/api/categoria', categoriaRoute)
 app.use('/api/stock', stockRoute)
