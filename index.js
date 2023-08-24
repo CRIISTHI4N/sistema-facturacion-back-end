@@ -26,7 +26,7 @@ coneccionDB()
 
 // Cors
 // =================================================
-const whiteList = [process.env.URL_FRONT, "192.168.1.3"]
+const whiteList = [process.env.URL_FRONT]
 const corsOptions = {
     origin: function (origin, callback) {
         if (whiteList.includes(origin)) {
@@ -36,7 +36,7 @@ const corsOptions = {
         }
     }
 }
-// app.use(cors(corsOptions))
+app.use(cors(corsOptions))
 // =================================================
 
 // Rutas
