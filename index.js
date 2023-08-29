@@ -42,19 +42,11 @@ app.use(cors(corsOptions))
 // Rutas
 
 app.get('/', (req, res) => {
-<<<<<<< HEAD
-    res.send('EN SERVICIO')
+    console.log('EN SERVICIO...');
+    res.send('EN SERVICIO...')
 })
 
 
-=======
-    console.log('HOLA');
-    res.send('asf')
-})
-
-
-
->>>>>>> 1d96529d7e7043e81b4bd449e010638ca00ac7bc
 app.use('/api/usuario', usuarioRoute)
 app.use('/api/categoria', categoriaRoute)
 app.use('/api/stock', stockRoute)
