@@ -7,6 +7,7 @@ import {
     listarFactura,
     listarFacturas,
     ingresarFactura,
+    actualizarFactura,
     eliminarFactura,
     crearCuerpoFactura,
     eliminarCuerpoFactura,
@@ -42,6 +43,7 @@ router.put('/devolver-stock/:id/:token', userAuth, devolverStock)
 router.get('/listar-facturas/:token', userAuth, listarFacturas)
 router.get('/listar-factura/:id/:token', userAuth, listarFactura)
 router.post('/ingresar-factura/:token', userAuth, ingresarFactura)
+router.put('/actualizar-factura/:id/:token', userAuth, actualizarFactura)
 router.delete('/eliminar-factura/:id/:token', userAuth, eliminarFactura)
 
 // Ventas

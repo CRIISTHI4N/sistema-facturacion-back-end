@@ -40,12 +40,20 @@ app.use(cors(corsOptions))
 // =================================================
 
 // Rutas
+
+app.get('/', (req, res) => {
+    res.send('EN SERVICIO')
+})
+
+
 app.use('/api/usuario', usuarioRoute)
 app.use('/api/categoria', categoriaRoute)
 app.use('/api/stock', stockRoute)
 app.use('/api/proveedor', proveedorRoute)
 app.use('/api/cliente', clienteRoute)
 app.use('/api/factura', facturaRoute)
+
+
 
 const PORT = process.env.PORT || 4000
 // Lanzamiento del servidor

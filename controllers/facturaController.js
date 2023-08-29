@@ -38,13 +38,13 @@ export const listarFactura = async (req, res) => {
     const factura = await Factura.findById(id)
         .select('cabecera numeroFactura cliente cuerpo subtotal descuento iva total createdAt')
         .populate('cabecera', 'ruc nombreLocal sucursal direccion')
-        .populate('cliente', '_id nombres apellidos identificacion direccion')
+        .populate('cliente', '_id nombres apellidos identificacion direccion telefono correo')
         .populate({
             path: 'cuerpo',
             select: '_id descripcionProducto cantidadProducto precioProducto descuentoProducto subtotal',
             populate: {
                 path: 'producto',
-                select: '_id codigo'
+                select: '_id codigo precioUnitario'
             },
         })
 
@@ -82,7 +82,6 @@ export const ingresarFactura = async (req, res) => {
         }
 
         return acumulador;
-
     }, new Decimal(0));
 
     // Iva
@@ -111,11 +110,102 @@ export const ingresarFactura = async (req, res) => {
     }
 }
 
-export const eliminarFactura = async (req, res) => {
+export const actualizarFactura = async (req, res) => {
+
+    const { cabecera, cliente, cuerpo } = req.body
     const { id } = req.params
 
+    const factura = await Factura.findById(id)
+
+    if (!factura) {
+        const error = new Error('Error, no se encontro esta factura')
+        return res.status(404).json({ msg: error.message })
+    }
+
+    // Extraemos el valor 'total' y 'cantidadProducto' del producto que se va a comprar
+    const productos = await Promise.all(
+        cuerpo.map(c => {
+            return CuerpoFactura.findById(c._id)
+                .select('cantidadProducto subtotal total')
+                .populate({
+                    path: 'producto', select: 'cantidad'
+                })
+        })
+    )
+
+    // Realizamos la suma total de todos los productos
+    // Subtotal
+    const subtotal = productos.reduce((acumulador, p) => acumulador.plus(new Decimal(Number(p.subtotal))), new Decimal(0));
+
+    const descuento = productos.reduce((acumulador, p) => {
+        if (Number(p.total) !== 0) {
+            return acumulador.plus(new Decimal(Number(p.subtotal)).minus(new Decimal(Number(p.total))));
+        }
+
+        return acumulador;
+    }, new Decimal(0));
+
+    // Iva
+    const iva = subtotal.times(0.12);
+
+    // Total a pagar
+    const total = subtotal.minus(descuento).plus(iva);
+
     try {
-        const factura = await Factura.findById(id)
+
+        factura.cabecera = cabecera || factura.cabecera
+        factura.numeroFactura = factura.numeroFactura
+        factura.cliente = cliente || factura.cliente
+        factura.cuerpo = cuerpo || factura.cuerpo
+        factura.subtotal = subtotal || factura.subtotal
+        factura.descuento = descuento || factura.descuento
+        factura.iva = iva || factura.iva
+        factura.total = total || factura.total
+
+        await factura.save()
+        return res.status(200).json({ msg: 'Factura actualizada correctamente' })
+
+    } catch (e) {
+        const error = new Error('Error, no se pudo eliminar la factura')
+        return res.status(404).json({ msg: error.message })
+    }
+}
+
+export const eliminarFactura = async (req, res) => {
+
+    const { id } = req.params
+
+    const factura = await Factura.findById(id)
+    const cuerpo = factura.cuerpo
+
+    const productos = await Promise.all(
+        cuerpo.map(c => {
+            return CuerpoFactura.findById(c._id)
+                .select('producto cantidadProducto')
+                .populate({
+                    path: 'producto', select: 'cantidad'
+                })
+        })
+    )
+
+    const productosFiltrados = productos.filter(p => p !== null);
+
+    try {
+        for (const p of productosFiltrados) {
+            try {
+                const stock = await Stock.findById(p.producto._id)
+                stock.cantidad += p.cantidadProducto
+                await stock.save()
+
+            } catch (error) { console.log(error) }
+        }
+
+    } catch (e) {
+        const error = new Error('Error, no se pudo devolver el stock')
+        return res.status(404).json({ msg: error.message })
+    }
+
+    try {
         factura.deleteOne()
         return res.status(200).json({ msg: 'Factura eliminada correctamente' })
 
@@ -124,8 +214,6 @@ export const eliminarFactura = async (req, res) => {
         return res.status(404).json({ msg: error.message })
     }
 }
-
-
 
 
 // Cabecera factura (datos del local)
@@ -379,7 +467,7 @@ export const devolverStock = async (req, res) => {
     try {
         productoStock.cantidad += parseInt(cantidad)
         await productoStock.save()
-        return res.status(204).json()
+        return res.status(200).json({ cantidad: productoStock.cantidad })
 
     } catch (e) {
         const error = new Error('Error, no se puedo devolver las cantidades al Stock')

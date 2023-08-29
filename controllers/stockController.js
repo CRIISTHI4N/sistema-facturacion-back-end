@@ -20,7 +20,7 @@ export const listarStock = async (req, res) => {
 }
 
 export const listadoCompra = async (req, res) => {
-    const stock = await Stock.find({}).select('_id nombre cantidad precioUnitario codigo')
+    const stock = await Stock.find({ estado: true }).select('_id nombre cantidad precioUnitario codigo')
 
     return res.status(200).json(stock)
 }

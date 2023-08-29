@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import moment from 'moment-timezone';
 
 const FacturaSchema = mongoose.Schema({
     cabecera: {
@@ -32,6 +33,14 @@ const FacturaSchema = mongoose.Schema({
     total: {
         type: mongoose.Decimal128
     },
+    createdAt: {
+        type: Date,
+        default: moment().tz('America/Guayaquil').toDate()
+    },
+    updatedAt: {
+        type: Date,
+        default: moment().tz('America/Guayaquil').toDate()
+    }
 }, { timestamps: true })
 
 export const Factura = mongoose.model('Factura', FacturaSchema)
